@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>My first three.js app</title>
+    <style>
+        body {
+            margin: 0;
+            /* background-color: aqua; */
+        }
+    </style>
+</head>
+
+<body>
+    <script src="../js/thress.js"></script>
+    <script src="../js/GLTFLoader.js"></script>
+    <script src="../js/OrbitControls.js"></script>
+    <script src="http://www.wjceo.com/lib/js/libs/stats.min.js"></script>
+
+    <script>
+
+
+        const scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
+        // const camera =  new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, - 10000, 10000 );
+        const renderer = new THREE.WebGLRenderer({
+            antialias: true,
+        });
+        //设置设备像素比。通常用于避免HiDPI设备上绘图模糊
+        renderer.setPixelRatio( window.devicePixelRatio );
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor(0xffffff,0);
+        renderer.outputEncoding = THREE.sRGBEncoding;
+
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1;
+        renderer.outputEncoding = THREE.sRGBEncoding;
+        document.body.appendChild(renderer.domElement);
+        const control = new THREE.OrbitControls(camera, renderer.domElement)
+        
+
+        // const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+        // const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+        // const cube = new THREE.Mesh( geometry, material );
+        // scene.add( cube );
+
+        camera.position.z = 5;
+
+
+        const loader = new THREE.GLTFLoader();
+        loader.load('../model/wanwan/scene.gltf', function (gltf) {
+            gltf.scene.scale.set(1, 1, 1); 
+            scene.add(gltf.scene);
+        },undefined,function(err){
+            console.log(err);
+        })
+        const light = new THREE.AmbientLight(0xffffff,0.5);
+        scene.add(light);
+
+        const directionLight = new THREE.DirectionalLight(0xffffff, 0.5);
+        directionLight.position.set(2,30,25)
+        scene.add(directionLight);
+
+        // const spotLight = new THREE.SpotLight(0xffffff,1,1000,Math.PI/2);
+        // spotLight.position.set(0, 21, 100);
+        // scene.add(spotLight);
+
+
+        const stats = new Stats()
+        document.body.appendChild(stats.dom);
+        scene.position.y=-0.5
+        camera.rotateZ(1000)
+        let deg = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+            scene.rotation.y+=0.01
+            stats.update();
+            control.update();
+            renderer.render(scene, camera);
+        }
+        animate();
+
+    </script>
+</body>
+
+</html>
