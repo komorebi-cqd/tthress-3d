@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>My first three.js app</title>
+    <style>
+        body {
+            margin: 0;
+            /* background-color: aqua; */
+        }
+    </style>
+</head>
+
+<body>
+    <script src="../js/thress.js"></script>
+    <script src="../js/GLTFLoader.js"></script>
+    <script src="../js/OrbitControls.js"></script>
+    <script src="http://www.wjceo.com/lib/js/libs/stats.min.js"></script>
+
+    <script>
+        let rotateObj = [];
+        function changePivot(obj){
+            console.log(obj);
+            let center = new THREE.Vector3();
+            console.log(center);
+            obj.geometry.computeBoundingBox();
+            // obj.scale.set(5,5,5)
+            obj.geometry.boundingBox.getCenter(center);
+            let wrapper = new THREE.Object3D();
+            wrapper.position.set(center.x, center.y, center.z);
+            obj.position.set(-center.x, -center.y, -center.z);
+            wrapper.add(obj);
+            scene.add(wrapper)
+            return wrapper;
+        }
+
+
+        const scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera( 100, window.innerWidth / window.innerHeight, 1, 1000 );
+        // camera = new THREE.OrthographicCamera( 100, window.innerWidth / window.innerHeight, 1, 1000 );
+        // const camera =  new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 1, 10000 );
+        const renderer = new THREE.WebGLRenderer({
+            antialias: true,
+        });
+        //设置设备像素比。通常用于避免HiDPI设备上绘图模糊
+        renderer.setPixelRatio( window.devicePixelRatio );
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor(0xffffff,0);
+        renderer.outputEncoding = THREE.sRGBEncoding;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1;
+        renderer.outputEncoding = THREE.sRGBEncoding;
+        document.body.appendChild(renderer.domElement);
+        const control = new THREE.OrbitControls(camera, renderer.domElement)
+        control.enabled = false
+        control.enableRotate =false
+        control.enableZoom = false
+        camera.position.z = 100;
+        const loader = new THREE.GLTFLoader();
+        loader.load('../model/building_normal.gltf', function (gltf) {
+            gltf.scene.children[0].children.forEach(i => rotateObj.push(changePivot(i)))
+            gltf.scene.children[0].children.forEach(i => rotateObj.push(changePivot(i)))
+            gltf.scenes[0].children[0].children.forEach(i => rotateObj.push(changePivot(i)))
+            // scene.add(gltf.scene);
+        },undefined,function(err){
+            console.log(err);
+        })
+
+        //环境光不知道为什么不生效
+        // const light = new THREE.AmbientLight( 0x404040,2);
+        // scene.add(light);
+
+        //设置了六个平行光  麻烦
+        const directionLight1 = new THREE.DirectionalLight(0xffffff, 1);
+        directionLight1.position.set(-300,0,0)
+        scene.add(directionLight1);
+
+        const directionLight2 = new THREE.DirectionalLight(0xffffff, 1);
+        directionLight2.position.set(300,0,0)
+        scene.add(directionLight2);
+        const directionLight3 = new THREE.DirectionalLight(0xffffff, 1);
+        directionLight3.position.set(0,300,0)
+        scene.add(directionLight3);
+        const directionLight4 = new THREE.DirectionalLight(0xffffff, 1);
+        directionLight4.position.set(0,300,0)
+        scene.add(directionLight4);
+
+        const directionLight5 = new THREE.DirectionalLight(0xffffff, 1);
+        directionLight5.position.set(0,0,-300)
+        scene.add(directionLight5);
+
+        const directionLight6 = new THREE.DirectionalLight(0xffffff, 1);
+        directionLight6.position.set(0,0,300)
+        scene.add(directionLight6);
+
+        // const spotLight = new THREE.SpotLight(0xffffff,1,1000,Math.PI/2);
+        // spotLight.position.set(0, 21, 100);
+        // scene.add(spotLight);
+
+        camera.position.set(0, 0, 100); //设置相机的摆放位置
+		camera.lookAt(new THREE.Vector3(0, 0, 0));
+        const stats = new Stats()
+        document.body.appendChild(stats.dom);
+        
+        scene.position.y=-25
+        function animate() {
+            requestAnimationFrame(animate);
+            scene.rotation.y+=0.01
+            stats.update();
+            control.update();
+            renderer.render(scene, camera);
+        }
+        animate();
+    </script>
+</body>
+
+</html>
